@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ejecutor de Scripts JS</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        button { margin: 10px 0; padding: 10px 20px; }
+        #output { 
+            margin-top: 10px; 
+            padding: 5px; 
+            border: 1px solid #ccc; 
+            min-height: 20px; 
+            background: #000000;      
+            color: #fff;         
+            white-space: pre-line;
+        }
+        select { margin: 10px 0; padding: 5px; }
+        #codigoScript {
+            margin-top: 25px;
+            padding: 70px;
+            background: #000000;
+            color: #fff;
+            border: 1px solid #444;
+            font-family: 'Fira Mono', 'Consolas', 'Courier New', monospace;
+            font-size: 15px;
+            white-space: pre;
+            overflow-x: auto;
+            max-height: 400px;
+        }
+        #codigoScriptTitulo {
+            margin-top: 30px;
+            font-weight: bold;
+            color: #000000;
+            font-size: 1.1em;
+        }
+        #imgSuperiorDerecha {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            width: 120px;
+            height: auto;
+            box-shadow: 2px 2px 8px #0004;
+            z-index: 100;
+        }
+        @media (max-width: 600px) {
+            #imgSuperiorDerecha { width: 70px; right: 10px; top: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <img id="imgSuperiorDerecha" src="https://avatars.githubusercontent.com/u/157991198?s=400&u=37e2ffe12a04c446a3cff05dd81daa85cbd394c8&v=4" alt="Imagen Personalizable">
+
+    <h1>Ejecutor Universal de Scripts JS</h1>
+    <p>Selecciona el script que deseas ejecutar:</p>
+    <select id="scriptSelector" onchange="mostrarCodigoAlSeleccionar()">
+        <option value="">-- Selecciona un script --</option>
+        <optgroup label="Objetos">
+            <option value="Objetos/ejercicio1CAJERO.js">Cajero Automático</option>
+            <option value="Objetos/ejercicio2RESERVAS.js">Reservas Hotel</option>
+            <option value="Objetos/ejercicio3UNIVERSIDAD.js">Universidad</option>
+            <option value="Objetos/ejercicio4TURNOS.js">Turnos Banco</option>
+            <option value="Objetos/ejercicio5CARRITO.js">Carrito Compras</option>
+            <option value="Objetos/ejercicio6MEDICAS.js">Citas Medicas</option>
+        </optgroup>
+        <optgroup label="Ciclos">
+            <option value="Ciclos/ejercicio1ENCUESTA.js">Encuesta</option>
+            <option value="Ciclos/ejercicio2TEMPERATURA.js">Temperatura</option>
+            <option value="Ciclos/ejercicio3AHORRO.js">Ahorro</option>
+            <option value="Ciclos/ejercicio4LOGIN.js">Login</option>
+            <option value="Ciclos/ejercicio5CALIFICACIONES.js">Calificaciones</option>
+            <option value="Ciclos/ejercicio6CAJERO.js">Cajero</option>
+            <option value="Ciclos/ejercicio7INVENTARIO.js">Inventario</option>
+            <option value="Ciclos/ejercicio8RESERVA.js">Reserva</option>
+        </optgroup>
+        <optgroup label="Switch">
+            <option value="Switch/ejercicio1NIVELES.js">Niveles</option>
+            <option value="Switch/ejercicio2LAVADORAS.js">Lavadoras</option>
+            <option value="Switch/ejercicio3SOPORTE.js">Soporte</option>
+            <option value="Switch/ejercicio4DESCUENTOS.js">Descuento</option>
+            <option value="Switch/ejercicio5BOLETOS.js">Boletos</option>
+            <option value="Switch/ejercicio6INTERNET.js">Internet</option>
+        </optgroup>
+    </select>
+    <button onclick="ejecutarSeleccionado()">Ejecutar Script</button>
+
+    <div id="output"></div>
+
+    <div id="codigoScriptTitulo"></div>
+    <pre id="codigoScript"></pre>
+
+    <script>
+        function mostrarCodigoAlSeleccionar() {
+            let nombreArchivo = document.getElementById('scriptSelector').value;
+            if (!nombreArchivo) {
+                document.getElementById('codigoScriptTitulo').innerText = '';
+                document.getElementById('codigoScript').innerText = '';
+                return;
+            }
+            mostrarCodigo(nombreArchivo);
+        }
+
+        function ejecutarSeleccionado() {
+            let nombreArchivo = document.getElementById('scriptSelector').value;
+            if (!nombreArchivo) {
+                document.getElementById('output').innerText = '[INFO] Selecciona un script para ejecutar.';
+                return;
+            }
+            ejecutarScript(nombreArchivo);
+        }
+
+        function ejecutarScript(nombreArchivo) {
+           let scripts = document.querySelectorAll('script[data-dinamico]');
+            scripts.forEach(s => s.remove());
+
+            document.getElementById('output').innerText = '';
+
+            let script = document.createElement('script');
+            script.src = nombreArchivo;
+            script.setAttribute('data-dinamico', 'true');
+            script.onerror = function() {
+                document.getElementById('output').innerText = '[ERROR] Archivo no encontrado: ' + nombreArchivo;
+            };
+            document.body.appendChild(script);
+        }
+
+        function mostrarCodigo(nombreArchivo) {
+            fetch(nombreArchivo)
+                .then(resp => {
+                    if (!resp.ok) throw new Error('No se pudo cargar el archivo');
+                    return resp.text();
+                })
+                .then(codigo => {
+                    document.getElementById('codigoScriptTitulo').innerText = 'Codigo fuente de: ' + nombreArchivo;
+                    document.getElementById('codigoScript').innerText = codigo;
+                })
+                .catch(err => {
+                    document.getElementById('codigoScriptTitulo').innerText = '';
+                    document.getElementById('codigoScript').innerText = '[ERROR] No se pudo cargar el código del script.';
+                });
+        }
+    </script>
+</body>
+</html>
